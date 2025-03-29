@@ -1,0 +1,3 @@
+com\mainapp\AuthenticationApp.class
+com\mainapp\Controller\AuthController.class
+com\mainapp\models\LoginRequest.class
