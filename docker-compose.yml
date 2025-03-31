@@ -1,19 +1,33 @@
 version: "3.8"
 services:
+  mysql:
+    image: mysql:8
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: erp
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always
+
   backend:
-    build:  # ✅ Dockerfile se build karwao
+    build:  
       context: .
-      dockerfile: Dockerfile  # ✅ Dockerfile ka naam specify karo
-    image: springboot-container:${VERSION}  # ✅ Local image use karo
+      dockerfile: Dockerfile  
+    image: springboot-container:${VERSION}  
     container_name: springboot-container
     ports:
       - "9090:9090"
     networks:
       - app-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/erp  # Connect to local MySQL
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/erp
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 
+      SPRING_DATASOURCE_PASSWORD: root
     restart: always
 
 networks:
@@ -21,5 +35,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
-    external: true  
+  mysql_data:  # Named volume instead of external
