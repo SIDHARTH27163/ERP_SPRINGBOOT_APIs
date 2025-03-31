@@ -14,20 +14,30 @@ services:
     networks:
       - app-network
     volumes:
-      - mysql_data:/var/lib/mysql
-    restart: always                        # ✅ Database ko preserve karo
+      - mysql_data:/var/lib/mysql            # ✅ Persistent volume for MySQL data
+      - ./mysql-init:/docker-entrypoint-initdb.d   # ✅ Initial schema script (optional)
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
 
   backend:
-    image: springboot-container:${VERSION}  # ✅ Dynamic versioning
+    image: springboot-container:${VERSION}  
     container_name: springboot-container
     ports:
-      - "9090:9090"                         # ✅ Updated port mapping
+      - "9090:9090"
     networks:
       - app-network
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/erp
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      mysql:
+        condition: service_healthy
     restart: always
 
 networks:
@@ -35,4 +45,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  mysql_data:                                # ✅ Named volume to persist MySQL data
