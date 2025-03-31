@@ -8,31 +8,27 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: erp
       MYSQL_USER: root
-      MYSQL_PASSWORD:
+      MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
     networks:
       - app-network
     volumes:
-      - mysql_data:/var/lib/mysql       # ✅ Persistent data
-    restart: always                      # ✅ Prevent container removal (even after docker-compose down)
+      - mysql_data:/var/lib/mysql
+    restart: always                        # ✅ Database ko preserve karo
 
   backend:
-    image: springboot-container:1.0.0
+    image: springboot-container:${VERSION}  # ✅ Dynamic versioning
     container_name: springboot-container
-    build:
-      context: .
-      dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
     networks:
       - app-network
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/erp
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD:
+      SPRING_DATASOURCE_PASSWORD: password
+    restart: always
 
 networks:
   app-network:
