@@ -1,43 +1,19 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  mysql:
-    image: mysql:8
-    container_name: mysql-container
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: erp
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    networks:
-      - app-network
-    volumes:
-      - mysql_data:/var/lib/mysql            # ✅ Persistent volume for MySQL data
-      - ./mysql-init:/docker-entrypoint-initdb.d   # ✅ Initial schema script (optional)
-    restart: always
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 5s
-
   backend:
-    image: springboot-container:${VERSION}  
+    build:  # ✅ Dockerfile se build karwao
+      context: .
+      dockerfile: Dockerfile  # ✅ Dockerfile ka naam specify karo
+    image: springboot-container:${VERSION}  # ✅ Local image use karo
     container_name: springboot-container
     ports:
       - "9090:9090"
     networks:
       - app-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/erp
+      SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/erp  # Connect to local MySQL
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
-    depends_on:
-      mysql:
-        condition: service_healthy
+      SPRING_DATASOURCE_PASSWORD: 
     restart: always
 
 networks:
@@ -45,4 +21,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:                                # ✅ Named volume to persist MySQL data
+  mysql_data:
+    external: true  
