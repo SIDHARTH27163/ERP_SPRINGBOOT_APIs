@@ -5,7 +5,7 @@ services:
     image: mysql:8
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: erp
       MYSQL_USER: root
       MYSQL_PASSWORD:
@@ -14,10 +14,11 @@ services:
     networks:
       - app-network
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql       # ✅ Persistent data
+    restart: always                      # ✅ Prevent container removal (even after docker-compose down)
 
   backend:
-    image: springboot-container:1.0.0    # ✅ Versioning image name
+    image: springboot-container:1.0.0
     container_name: springboot-container
     build:
       context: .
