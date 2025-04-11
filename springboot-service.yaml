@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: springboot-service
+  name: springboot-backend-service
 spec:
   type: NodePort
   selector:
@@ -9,4 +9,4 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30090
+      nodePort: 30091
